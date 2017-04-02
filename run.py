@@ -1,5 +1,12 @@
 import datetime
 import urllib
+from Tkinter import *
+
+dict = {
+    'google':'goog',
+    'apple':'aapl',
+    'yahoo': 'yhoo',
+    'hp':'hpq'}
 
 
 class Quote(object):
@@ -85,10 +92,17 @@ class YahooQuote(Quote):
 
 
 if __name__ == '__main__':
-  q = YahooQuote('aapl','2017-04-01')              # download year to date Apple data
-  print q                                          # print it out
-  q = YahooQuote('orcl','2017-03-01','2017-04-3') # download Oracle data
-  q.write_csv('orcl.csv')                          # save it to disk
-  q = Quote()                                      # create a generic quote object
-  q.read_csv('orcl.csv')                           # populate it with our previously saved data
-  print q                                          # print it out
+
+    # root = Tk()
+    # # Gui installation
+    # root.mainloop()
+
+
+    q = YahooQuote('goog','2017-03-01')              # download year to date Apple data
+    q.write_csv('quote.csv')                         # save it to disk
+    print q                                          # print it out
+    # q = YahooQuote('orcl','2017-03-01','2017-04-3')  # download Oracle data
+    # q.write_csv('orcl.csv')                          # save it to disk
+    # q = Quote()                                      # create a generic quote object
+    # q.read_csv('orcl.csv')                           # populate it with our previously saved data
+    # print q                                          # print it out
