@@ -1,6 +1,8 @@
 import datetime
 import urllib
-from Tkinter import *
+import Tkinter as tk
+
+LARGE_FONT = ("Verdana", 12)
 
 dict = {
     'google':'goog',
@@ -54,10 +56,10 @@ class Quote(object):
 
 
 
-class YahooQuote(Quote):
+class Yahoo(Quote):
   ''' Daily quotes from Yahoo. Date format='yyyy-mm-dd' '''
   def __init__(self,symbol,start_date,end_date=datetime.date.today().isoformat()):
-    super(YahooQuote,self).__init__()
+    super(Yahoo, self).__init__()
     self.symbol = symbol.upper()
     start_year,start_month,start_day = start_date.split('-')
     start_month = str(int(start_month)-1)
@@ -90,19 +92,53 @@ class YahooQuote(Quote):
 # For the script, the interval is easily set by using the following part of the code.
 # The formation of url will straight away append the hist price url and dividend url in a single function.
 
+class Gui(tk.Tk):
+    def __init__(self, *args, **kwargs):
+        tk.Tk.__init__(self, *args, **kwargs)
+        container = tk.Frame(self)
+        container.pack()
+        # container.pack(side = "top", fill = "both", expend = True)
+
+        container.grid_rowconfigure(0, weight = 1)
+        container.grid_columnconfigure(0, weight = 1)
+
+        self.frames = {}
+        frame= StartPage(container, self)
+
+        self.frames[StartPage] = frame
+
+        frame.grid()
+        # frame.grid(row = 0, column = 0, sticky = "Main Windows")
+
+        self.show_frame(StartPage)
+
+    def show_frame(self, count):
+        frame = self.frames[count]
+        frame.tkraise()
+
+class StartPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        label = tk.Label(self, text = "Regression On Stocks")
+        label.pack()
+        # label.pack(pady = 10, padx = 10)
 
 if __name__ == '__main__':
 
-    # root = Tk()
+    q = Yahoo('goog', '2017-03-01')                     # download year to date Apple data
+    q.write_csv('quote.csv')                            # save it to disk
+    # print q                                           # print it out
+    # q = YahooQuote('orcl','2017-03-01','2017-04-3')   # download Oracle data
+    # q.write_csv('orcl.csv')                           # save it to disk
+    # q = Quote()                                       # create a generic quote object
+    # q.read_csv('orcl.csv')                            # populate it with our previously saved data
+    # print q                                           # print it out
+
+    run = Gui()
     # # Gui installation
-    # root.mainloop()
 
 
-    q = YahooQuote('goog','2017-03-01')              # download year to date Apple data
-    q.write_csv('quote.csv')                         # save it to disk
-    print q                                          # print it out
-    # q = YahooQuote('orcl','2017-03-01','2017-04-3')  # download Oracle data
-    # q.write_csv('orcl.csv')                          # save it to disk
-    # q = Quote()                                      # create a generic quote object
-    # q.read_csv('orcl.csv')                           # populate it with our previously saved data
-    # print q                                          # print it out
+    run.mainloop()
+
+
+
