@@ -1,14 +1,36 @@
+import matplotlib
+matplotlib.use("TkAgg")
 import datetime
 import urllib
-import Tkinter as tk
+from matplotlib.figure import Figure
+import matplotlib.pyplot as plt
+from functools import partial
+import matplotlib.animation as animation
+
+
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
+
+try:
+    # Python2
+    import Tkinter as tk
+except ImportError:
+    # Python3
+    import tkinter as tk
 
 LARGE_FONT = ("Verdana", 12)
 
 dict = {
-    'google':'goog',
-    'apple':'aapl',
-    'yahoo': 'yhoo',
-    'hp':'hpq'}
+    'Google':'goog',
+    'Apple':'aapl',
+    'Yahoo': 'yhoo',
+    'HP':'hpq'}
+
+f = Figure(figsize=(10, 10), dpi=100)
+a = f.add_subplot(111)
+
+# Default values
+comp = dict.items()[0][0]
+code = dict.items()[0][1]
 
 
 class Quote(object):
@@ -54,8 +76,6 @@ class Quote(object):
     def __repr__(self):
         return self.to_csv()
 
-
-
 class Yahoo(Quote):
   ''' Daily quotes from Yahoo. Date format='yyyy-mm-dd' '''
   def __init__(self,symbol,start_date,end_date=datetime.date.today().isoformat()):
@@ -92,6 +112,7 @@ class Yahoo(Quote):
 # For the script, the interval is easily set by using the following part of the code.
 # The formation of url will straight away append the hist price url and dividend url in a single function.
 
+
 class Gui(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
@@ -116,23 +137,117 @@ class Gui(tk.Tk):
         frame = self.frames[count]
         frame.tkraise()
 
-class StartPage(tk.Frame):
-    def __init__(self, parent, controller):
-        tk.Frame.__init__(self, parent)
-        label = tk.Label(self, text = "Regression On Stocks")
-        label.pack()
-        # label.pack(pady = 10, padx = 10)
 
-if __name__ == '__main__':
-
-    q = Yahoo('goog', '2017-03-01')                     # download year to date Apple data
-    q.write_csv('quote.csv')                            # save it to disk
-    # print q                                           # print it out
+def calculation_plots():
+    q = Yahoo(str(code), '2017-03-01')  # download year to date Apple data
+    # q = Yahoo('goog', '2017-03-01')  # download year to date Apple data
+    q.write_csv('db.csv')  # save it to disk
+    # print q  # print it out
     # q = YahooQuote('orcl','2017-03-01','2017-04-3')   # download Oracle data
     # q.write_csv('orcl.csv')                           # save it to disk
     # q = Quote()                                       # create a generic quote object
     # q.read_csv('orcl.csv')                            # populate it with our previously saved data
     # print q                                           # print it out
+
+    pullData = open("db.csv", "r").read()
+    dataList = pullData.split('\n')
+    print (dataList)
+    xList = []
+    yList = []
+
+    # length = len((dataList))
+    # x = range(len(dataList))
+    plt.xlabel("Date")
+    plt.ylabel("Value")
+    plt.title("Graph")
+
+    for line in dataList:
+        if len(line) > 1:
+            obj = line.split(',')
+            print (obj)
+
+            y = float(obj[3])
+            x = datetime.datetime.strptime(obj[1], "%Y-%m-%d")
+            print (x)
+            print (y)
+
+            xList.append(x)
+            yList.append(y)
+
+    a.clear()
+    plt.plot(xList, yList)
+    plt.legend()
+    plt.show()
+
+
+# a.plot([1,2,3,4,5,6,7,8],[5,6,2,7,9,3,3,5])
+
+def googleHandler():
+    global comp, code
+    comp = "Google"
+    code = dict[comp]
+    calculation_plots()
+
+
+def appleHandler():
+    global comp, code
+    comp = "Apple"
+    code = dict[comp]
+    calculation_plots()
+
+
+def yahooHandler():
+    global comp, code
+    comp = "Yahoo"
+    code = dict[comp]
+    calculation_plots()
+
+
+def hpHandler():
+    global comp, code
+    comp = "HP"
+    code = dict[comp]
+    calculation_plots()
+
+
+class StartPage(tk.Frame):
+    def __init__(self, parent, controller):
+        tk.Frame.__init__(self, parent)
+        self.button = []
+        label = tk.Label(self, text = "Regression On Stocks")
+        label.pack()
+
+        label2 = tk.Label(self, text = "Choose a company")
+        label2.pack()
+
+
+        button1 = tk.Button(self, text = "Google",
+                            command = lambda: googleHandler())
+        button1.pack()
+
+        button2 = tk.Button(self, text = "Apple",
+                            command = lambda: appleHandler())
+        button2.pack()
+
+        button3 = tk.Button(self, text = "Yahoo",
+                            command = lambda: yahooHandler())
+        button3.pack()
+
+        button4 = tk.Button(self, text = "HP",
+                            command = lambda: hpHandler())
+        button4.pack()
+
+        # canvas = FigureCanvasTkAgg(f, self)
+        # canvas.show()
+        # canvas.get_tk_widget().pack()
+
+
+
+
+
+if __name__ == '__main__':
+
+
 
     run = Gui()
     # # Gui installation
