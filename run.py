@@ -1,5 +1,3 @@
-@aut
-
 import matplotlib
 matplotlib.use("TkAgg")
 import datetime
