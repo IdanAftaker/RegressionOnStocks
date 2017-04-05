@@ -191,19 +191,17 @@ def calculation_plots():
     polynomial = numpy.poly1d(coefficients)
     final = polynomial(xReg)
 
-    print (polynomial)
-    print (coefficients)
-    # plt.plot(xReg, numpy.polyval(var, xReg), 'r-')
+    # print (polynomial)
+    # print (coefficients)
 
-
-    plt.plot(xReg, final, 'r-')
-    # plt.plot(xList, yList, 'o')
+    plt.title(comp)
+    # plt.plot(xReg, final, 'r-')
+    # plt.plot(xReg, final, 'r-')
+    plt.plot(xList, yList, 'o')
 
     plt.legend()
     plt.show()
 
-
-# a.plot([1,2,3,4,5,6,7,8],[5,6,2,7,9,3,3,5])
 
 def googleHandler():
     global comp, code
@@ -297,14 +295,8 @@ class StartPage(tk.Frame):
         # canvas.show()
         # canvas.get_tk_widget().pack()
 
-
-
-
-
 if __name__ == '__main__':
     # # Gui installation
-
-
     run = Gui()
     run.mainloop()
 
