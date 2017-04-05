@@ -4,6 +4,9 @@ import datetime
 import urllib
 from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
+import numpy
+
+from scipy.interpolate import *
 from functools import partial
 import matplotlib.animation as animation
 
@@ -23,10 +26,15 @@ dict = {
     'Google':'goog',
     'Apple':'aapl',
     'Yahoo': 'yhoo',
-    'HP':'hpq'}
+    'HP':'hpq',
+    'Facebook' :'fb',
+    'Amazon' : 'amzn',
+    'Twitter' : 'twtr'}
 
 f = Figure(figsize=(10, 10), dpi=100)
 a = f.add_subplot(111)
+sixMonthAgo = datetime.date.today() - datetime.timedelta(6 * 365 / 12)
+
 
 # Default values
 comp = dict.items()[0][0]
@@ -139,8 +147,7 @@ class Gui(tk.Tk):
 
 
 def calculation_plots():
-    q = Yahoo(str(code), '2017-03-01')  # download year to date Apple data
-    # q = Yahoo('goog', '2017-03-01')  # download year to date Apple data
+    q = Yahoo(str(code), str(sixMonthAgo))  # download six month ago data
     q.write_csv('db.csv')  # save it to disk
     # print q  # print it out
     # q = YahooQuote('orcl','2017-03-01','2017-04-3')   # download Oracle data
@@ -151,12 +158,11 @@ def calculation_plots():
 
     pullData = open("db.csv", "r").read()
     dataList = pullData.split('\n')
-    print (dataList)
     xList = []
     yList = []
+    xReg=[]
+    yReg=[]
 
-    # length = len((dataList))
-    # x = range(len(dataList))
     plt.xlabel("Date")
     plt.ylabel("Value")
     plt.title("Graph")
@@ -165,17 +171,34 @@ def calculation_plots():
         if len(line) > 1:
             obj = line.split(',')
             print (obj)
-
-            y = float(obj[3])
+            # [0:Name, 1: Date, 2: Time, 3: Open, 4: High, 5: Low, 6: Close, 7: Volume]
+            y = float(obj[6])
             x = datetime.datetime.strptime(obj[1], "%Y-%m-%d")
-            print (x)
-            print (y)
-
             xList.append(x)
             yList.append(y)
 
-    a.clear()
-    plt.plot(xList, yList)
+            x = float(obj[3])
+            y = float(obj[6])
+            xReg.append(x)
+            yReg.append(y)
+
+
+    # a.clear()
+
+    print (xReg)
+    print (yReg)
+    coefficients = numpy.polyfit(xReg, yReg, 1)
+    polynomial = numpy.poly1d(coefficients)
+    final = polynomial(xReg)
+
+    print (polynomial)
+    print (coefficients)
+    # plt.plot(xReg, numpy.polyval(var, xReg), 'r-')
+
+
+    plt.plot(xReg, final, 'r-')
+    # plt.plot(xList, yList, 'o')
+
     plt.legend()
     plt.show()
 
@@ -210,10 +233,31 @@ def hpHandler():
     calculation_plots()
 
 
+def facebookHandler():
+    global comp, code
+    comp = "Facebook"
+    code = dict[comp]
+    calculation_plots()
+
+
+def amazonHandler():
+    global comp, code
+    comp = "Amazon"
+    code = dict[comp]
+    calculation_plots()
+
+
+def twitterHandler():
+    global comp, code
+    comp = "Twitter"
+    code = dict[comp]
+    calculation_plots()
+
+
 class StartPage(tk.Frame):
     def __init__(self, parent, controller):
         tk.Frame.__init__(self, parent)
-        self.button = []
+
         label = tk.Label(self, text = "Regression On Stocks")
         label.pack()
 
@@ -236,6 +280,18 @@ class StartPage(tk.Frame):
         button4 = tk.Button(self, text = "HP",
                             command = lambda: hpHandler())
         button4.pack()
+        
+        button5 = tk.Button(self, text = "Facebook",
+                            command = lambda: facebookHandler())
+        button5.pack()
+
+        button6 = tk.Button(self, text="Amazon",
+                            command=lambda: amazonHandler())
+        button6.pack()
+
+        button7 = tk.Button(self, text="Twitter",
+                            command=lambda: twitterHandler())
+        button7.pack()
 
         # canvas = FigureCanvasTkAgg(f, self)
         # canvas.show()
@@ -246,13 +302,10 @@ class StartPage(tk.Frame):
 
 
 if __name__ == '__main__':
-
-
-
-    run = Gui()
     # # Gui installation
 
 
+    run = Gui()
     run.mainloop()
 
 
