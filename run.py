@@ -1,3 +1,5 @@
+@aut
+
 import matplotlib
 matplotlib.use("TkAgg")
 import datetime
@@ -6,11 +8,10 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy
 
+
 from scipy.interpolate import *
 from functools import partial
 import matplotlib.animation as animation
-
-
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2TkAgg
 
 try:
@@ -19,8 +20,6 @@ try:
 except ImportError:
     # Python3
     import tkinter as tk
-
-LARGE_FONT = ("Verdana", 12)
 
 dict = {
     'Google':'goog',
@@ -108,25 +107,11 @@ class Yahoo(Quote):
       self.append(dt,open_,high,low,close,volume)
 
 
-
-# http://ichart.yahoo.com/table.csv?s=S58.SI&c=2009&a=9&b=23&f=2014&d=9&e=22&g=d&ignore=.csv
-#
-# The blue part is the stock symbol (only one symbol can be run at a time), the pink and green portion represent the start and end date respectively.
-# The brown portion is the interval in d,m, y.
-# By changing the interval g = v, the dividend information as in the dividend payout at the particular date is given. The url str is as below.
-
-# http://ichart.yahoo.com/table.csv?s=S58.SI&c=2009&a=9&b=23&f=2014&d=9&e=22&g=v&ignore=.csv
-#
-# For the script, the interval is easily set by using the following part of the code.
-# The formation of url will straight away append the hist price url and dividend url in a single function.
-
-
 class Gui(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         container = tk.Frame(self)
         container.pack()
-        # container.pack(side = "top", fill = "both", expend = True)
 
         container.grid_rowconfigure(0, weight = 1)
         container.grid_columnconfigure(0, weight = 1)
@@ -137,7 +122,6 @@ class Gui(tk.Tk):
         self.frames[StartPage] = frame
 
         frame.grid()
-        # frame.grid(row = 0, column = 0, sticky = "Main Windows")
 
         self.show_frame(StartPage)
 
@@ -149,15 +133,9 @@ class Gui(tk.Tk):
 def calculation_plots():
     q = Yahoo(str(code), str(sixMonthAgo))  # download six month ago data
     q.write_csv('db.csv')  # save it to disk
-    # print q  # print it out
-    # q = YahooQuote('orcl','2017-03-01','2017-04-3')   # download Oracle data
-    # q.write_csv('orcl.csv')                           # save it to disk
-    # q = Quote()                                       # create a generic quote object
-    # q.read_csv('orcl.csv')                            # populate it with our previously saved data
-    # print q                                           # print it out
 
-    pullData = open("db.csv", "r").read()
-    dataList = pullData.split('\n')
+    pullData = open("db.csv", "r").read() #read data
+    dataList = pullData.split('\n') #split data
     xList = []
     yList = []
     xReg=[]
@@ -165,7 +143,7 @@ def calculation_plots():
 
     plt.xlabel("Date")
     plt.ylabel("Value")
-    plt.title("Graph")
+    plt.title(comp)
 
     for line in dataList:
         if len(line) > 1:
@@ -183,19 +161,11 @@ def calculation_plots():
             yReg.append(y)
 
 
-    # a.clear()
-
-    print (xReg)
-    print (yReg)
     coefficients = numpy.polyfit(xReg, yReg, 1)
     polynomial = numpy.poly1d(coefficients)
     final = polynomial(xReg)
 
-    # print (polynomial)
-    # print (coefficients)
-
-    plt.title(comp)
-    # plt.plot(xReg, final, 'r-')
+    plt.plot(xList, final, 'r-')
     # plt.plot(xReg, final, 'r-')
     plt.plot(xList, yList, 'o')
 
