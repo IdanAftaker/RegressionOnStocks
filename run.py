@@ -6,7 +6,9 @@ from matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import numpy
 
-
+import matplotlib.dates as mdates
+from scipy import linspace, polyval, polyfit, sqrt, stats, randn
+from pylab import plot, title, show , legend
 from scipy.interpolate import *
 from functools import partial
 import matplotlib.animation as animation
@@ -146,7 +148,7 @@ def calculation_plots():
     for line in dataList:
         if len(line) > 1:
             obj = line.split(',')
-            print (obj)
+            # print (obj)
             # [0:Name, 1: Date, 2: Time, 3: Open, 4: High, 5: Low, 6: Close, 7: Volume]
             y = float(obj[6])
             x = datetime.datetime.strptime(obj[1], "%Y-%m-%d")
@@ -154,20 +156,38 @@ def calculation_plots():
             yList.append(y)
 
             x = float(obj[3])
-            y = float(obj[6])
+            y = float(obj[3])
             xReg.append(x)
             yReg.append(y)
 
 
+    # x = mdates.date2num(xList)
+    # print (x)
+    # dd = mdates.num2date(x)
+    # print (dd)
+
+    # dtv = datetime(xList, 'Format', 'yyyy-MM-dd', 'ConvertFrom', 'datenum');
+    # dnv = datetime.datenum(xList);
+    #
+    # print (dnv)
+
     coefficients = numpy.polyfit(xReg, yReg, 1)
+    # print ("coefficients")
+    # print (coefficients)
     polynomial = numpy.poly1d(coefficients)
+    # print ("polynomial")
+    # print (polynomial)
     final = polynomial(xReg)
+    # print ("final")
+    # print (final)
+
+
 
     plt.plot(xList, final, 'r-')
-    # plt.plot(xReg, final, 'r-')
+    # plt.plot(xList, final, 'r-')
     plt.plot(xList, yList, 'o')
 
-    plt.legend()
+    plt.legend(['regression','original'])
     plt.show()
 
 
